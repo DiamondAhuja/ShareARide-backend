@@ -5,8 +5,7 @@ const { db } = require("../util/admin");
 exports.registerUser = async (data,res) => {
     const customerinformationDB = db.collection('CustomerInformationDB');
     try{
-        
-            console.log(data);
+            //console.log(data);
             db.collection("CustomerInformationDB").doc(data.CUID).create({
                 "id": data.CUID,
                 "firstName": data.firstname,
@@ -16,8 +15,9 @@ exports.registerUser = async (data,res) => {
                 "DiscordAuthToken": "",
                 "DOB": data.DOB,
                 "rating":0,
-                "friendRequestList":[""],
-                "friendList":[""],
+                "friendRequestList":[],
+                "friendList":[],
+                "sentFriendRequestList":[],
                 "email": data.email
             })
             .then((docRef) => {

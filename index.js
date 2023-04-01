@@ -4,7 +4,8 @@ var express = require('express');
 var app = express();
 const PORT = process.env.PORT || 5050
 const { books } = require('./handlers/books')
-const { registerUser } = require('./handlers/registerUser')
+const { registerUser } = require('./handlers/createAccount_Controller')
+const { getFriends, sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend } = require('./handlers/addFriends_Controller')
 const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
 const bodyParser = require('body-parser');
@@ -26,7 +27,7 @@ app.get('/', (req, res) => {
 
 // API CALL for Creating an account  ///////////////////////// DONE
 app.post('/registeraccount/', function(req, res){
-    console.log(req.body);
+    //console.log(req.body);
     let email = req.body.email; 
     let password = req.body.password;
     let firstname = req.body.firstname;
@@ -99,12 +100,50 @@ app.post('/logout/', function(req, res){
 });
 
 // API CALL for Sending a friend request
-app.post('/addfriend/', function(req, res){
-    var UID_requestor = req.body.UID_requestor;
-    var UID_friend_wanna_add = req.body.UID_friend_wanna_add
-})
+app.post('/sendfriendrequest/', function(req, res){
+    var Data = {
+        requestor_CUID: req.body.UID_requestor,
+        reciever_CUID: req.body.UID_reciever
+    };
+    //console.log(Data);
+    sendFriendRequest(Data, res);
+});
 
+// API CALL for GET FRIENDS LIST
+app.get('/getfriendslist/', function(req, res){
+    var UID = req.body.UID;
+    getFriends(UID, res);
+});
 
+// API CALL for ACCEPTING a friend request
+app.post('/acceptfriendrequest/', function(req, res){
+    var Data = {
+        requestor_CUID: req.body.UID_requestor,
+        acceptor_CUID: req.body.UID_acceptor
+    };
+    //console.log(Data);
+    acceptFriendRequest(Data, res);
+});
+
+// API CALL for DECLINING a friend request
+app.post('/declinefriendrequest/', function(req, res){
+    var Data = {
+        requestor_CUID: req.body.UID_requestor,
+        decliner_CUID: req.body.UID_decliner
+    };
+    //console.log(Data);
+    declineFriendRequest(Data, res);
+});
+
+// API CALL for REMOVING a friend 
+app.post('/removefriend/', function(req, res){
+    var Data = {
+        remover_CUID: req.body.UID_remover,
+        removed_CUID: req.body.UID_removed
+    };
+    //console.log(Data);
+    removeFriend(Data, res);
+});
 
 app.listen(PORT, function() {
     console.log(`Demo project at: ${PORT}!`);
