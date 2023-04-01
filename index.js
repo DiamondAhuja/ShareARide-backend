@@ -4,8 +4,9 @@ var express = require('express');
 var app = express();
 const PORT = process.env.PORT || 5050
 const { books } = require('./handlers/books')
-const { registerUser } = require('./handlers/createAccount_Controller')
+const { registerUser, getUserInfo } = require('./handlers/createAccount_Controller')
 const { getFriends, sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend } = require('./handlers/addFriends_Controller')
+const { deleteUser } = require('./handlers/profileEditing_Controller')
 const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
 const bodyParser = require('body-parser');
@@ -97,6 +98,18 @@ app.post('/logout/', function(req, res){
         res.send("Logout failed");
         console.log("Logout failed", error);
     });
+});
+
+// API CALL for Getting a user's information
+app.get('/getuserinfo/', function(req, res){
+    var UID = req.body.UID;
+    getUserInfo(UID, res);
+});
+
+// API CALL for deleting user
+app.post('/deleteuser/', function(req, res){
+    var UID = req.body.UID;
+    deleteUser(UID, res);
 });
 
 // API CALL for Sending a friend request
