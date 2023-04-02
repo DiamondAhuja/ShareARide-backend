@@ -78,8 +78,8 @@ app.post('/login/', function(req, res){
     .then((userCredential) => {
         // Signed in
         var user = userCredential.user;
-        res.send("Login successful");
-        console.log("Login successful");
+        res.json({Message: "Login successful!", UID: user.uid});
+        console.log("Login successful", user.uid);
         // ...
     })
     .catch((error) => {
