@@ -43,7 +43,7 @@ app.post('/registeraccount/', function(req, res){
         password: password,    
     }).then((userRecord) => {
         const user = userRecord.uid;
-        res.send("Account created successfully");
+        res.send({Message: "Registration successful!", UID: user});
         console.log("Success, here is the UID:", user);
 
         var docData = {
