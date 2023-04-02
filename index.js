@@ -161,7 +161,7 @@ app.post('/removefriend/', function(req, res){
 
 app.post('/rateuser', function(req, res){
     var Data = {
-        CUID: req.body.CUID,
+        CUID: req.body.UID,
         rating: req.body.rating
     };
     rateUser(Data, res);

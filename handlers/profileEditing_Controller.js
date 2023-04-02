@@ -17,7 +17,7 @@ exports.editUserProfile = async (data,res) => {
                 "address": data.address,
                 "DiscordAuthToken": "",
                 "DOB": data.DOB,
-                "rating":0,
+                "rating":5.0,
                 "friendRequestList":[],
                 "friendList":[],
                 "sentFriendRequestList":[],
