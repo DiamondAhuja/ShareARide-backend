@@ -10,6 +10,7 @@ const { deleteUser } = require('./handlers/profileEditing_Controller')
 const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
 const bodyParser = require('body-parser');
+const { rateUser } = require('./handlers/rating_Controller');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -157,6 +158,15 @@ app.post('/removefriend/', function(req, res){
     //console.log(Data);
     removeFriend(Data, res);
 });
+
+app.post('/rateuser', function(req, res){
+    var Data = {
+        CUID: req.body.CUID,
+        rating: req.body.rating
+    };
+    rateUser(Data, res);
+});
+
 
 app.listen(PORT, function() {
     console.log(`Demo project at: ${PORT}!`);
