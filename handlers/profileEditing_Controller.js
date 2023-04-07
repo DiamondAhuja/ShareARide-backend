@@ -10,17 +10,11 @@ exports.editUserProfile = async (data,res) => {
     try{
             //console.log(data);
             db.collection("CustomerInformationDB").doc(data.CUID).update({
-                "id": data.CUID,
                 "firstName": data.firstname,
                 "lastName": data.lastname,
                 "phoneNumber": data.phonenumber,
                 "address": data.address,
-                "DiscordAuthToken": "",
-                "DOB": data.DOB,
-                "rating":5.0,
-                "friendRequestList":[],
-                "friendList":[],
-                "sentFriendRequestList":[],
+                //"DiscordAuthToken": "",
                 "email": data.email
             })
             .then((docRef) => {

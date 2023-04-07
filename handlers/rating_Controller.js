@@ -5,7 +5,7 @@ const { admin } = require("../util/admin");
 // this function will create a document for the user with the parameters defined
 const customerinformationDB = db.collection('CustomerInformationDB');
 
-// need to fix this function
+// done
 exports.rateUser = async (inputdata, res) => {
     try {
         //console.log(data);
