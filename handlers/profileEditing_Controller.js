@@ -6,28 +6,28 @@ const { admin } = require("../util/admin");
 const customerinformationDB = db.collection('CustomerInformationDB');
 
 // need to fix this function
-exports.editUserProfile = async (data,res) => {
-    try{
-            //console.log(data);
-            db.collection("CustomerInformationDB").doc(data.CUID).update({
-                "id": data.CUID,
-                "firstName": data.firstname,
-                "lastName": data.lastname,
-                "phoneNumber": data.phonenumber,
-                "address": data.address,
-                "DiscordAuthToken": "",
-                "DOB": data.DOB,
-                "rating":5.0,
-                "friendRequestList":[],
-                "friendList":[],
-                "sentFriendRequestList":[],
-                "email": data.email
-            })
+exports.editUserProfile = async (data, res) => {
+    try {
+        //console.log(data);
+        db.collection("CustomerInformationDB").doc(data.CUID).update({
+            "id": data.CUID,
+            "firstName": data.firstName,
+            "lastName": data.lastName,
+            "phoneNumber": data.phoneNumber,
+            "address": data.address,
+            "DiscordAuthToken": "",
+            "DOB": data.DOB,
+            "rating": data.rating,
+            "friendRequestList": [],
+            "friendList": [],
+            "sentFriendRequestList": [],
+            "email": data.email
+        })
             .then((docRef) => {
-                console.log("Document updated");
+                console.log("Profile updated");
             })
             .catch((error) => {
-                console.error("Error updating document: ", error);
+                console.error("Error updating profile: ", error);
             });
     } catch (error) {
         console.log("Something went wrong, please try again", error);
@@ -35,21 +35,21 @@ exports.editUserProfile = async (data,res) => {
 };
 
 exports.deleteUser = async (uid, res) => {
-    try{
+    try {
         admin.auth().deleteUser(uid)
-        .then(() => {
+            .then(() => {
 
-            customerinformationDB.doc(uid).delete().then(() => {
-                console.log("Document successfully deleted!");
-            }).catch((error) => {
-                console.error("Error removing document: ", error);
+                customerinformationDB.doc(uid).delete().then(() => {
+                    console.log("Document successfully deleted!");
+                }).catch((error) => {
+                    console.error("Error removing document: ", error);
+                });
+                console.log('Successfully deleted user');
+                res.status(201).json({ general: "Successfully deleted user" });
+            })
+            .catch((error) => {
+                console.log('Error deleting user:', error);
             });
-            console.log('Successfully deleted user');
-            res.status(201).json({ general: "Successfully deleted user"});
-        })
-        .catch((error) => {
-            console.log('Error deleting user:', error);
-        });
     } catch (error) {
         console.log("Something went wrong, please try again", error);
     }
