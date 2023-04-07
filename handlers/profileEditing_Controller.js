@@ -45,10 +45,12 @@ exports.changePassword = async (data, res) => {
         })
             .then(function (userRecord) {
                 // See the UserRecord reference doc for the contents of userRecord.
-                console.log("Successfully updated user", userRecord.toJSON());
+                console.log("Successfully updated user");
+                res.status(201).json({ general: "Successfully update user password" });
             })
             .catch(function (error) {
                 console.log("Error updating user:", error);
+                return res.status(500).json({ general: "Something went wrong, please try again" });
             });
     } catch (error) {
         console.log("Something went wrong, please try again", error);
