@@ -11,6 +11,7 @@ const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
 const bodyParser = require('body-parser');
 const { rateUser } = require('./handlers/rating_Controller');
+const { validateTaxiInfo } = require('./handlers/system_Controller');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -182,6 +183,11 @@ app.post('/rateuser', function (req, res) {
     rateUser(Data, res);
 });
 
+// API CALL for scanning qr code
+app.get('/scanqrcode', function (req, res) {
+    var qrcode = req.body.qrcode;
+    validateTaxiInfo(qrcode, res);
+});
 
 app.listen(PORT, function () {
     console.log(`Demo project at: ${PORT}!`);
