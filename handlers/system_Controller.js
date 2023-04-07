@@ -31,6 +31,8 @@ exports.validateTaxiInfo = async (qrcode, res) => {
     }
 };
 
+
+// need to fix fare calculations
 exports.offertempCarpool = async (data, res) => {
     try {
         //console.log(data);
