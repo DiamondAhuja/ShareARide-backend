@@ -11,7 +11,7 @@ const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
 const bodyParser = require('body-parser');
 const { rateUser } = require('./handlers/rating_Controller');
-const { validateTaxiInfo } = require('./handlers/system_Controller');
+const { validateTaxiInfo, offertempCarpool } = require('./handlers/system_Controller');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -187,6 +187,22 @@ app.post('/rateuser', function (req, res) {
 app.get('/scanqrcode', function (req, res) {
     var qrcode = req.body.qrcode;
     validateTaxiInfo(qrcode, res);
+});
+
+// API CALL for offering temporary carpool
+app.post('/offertempcarpool', function (req, res) {
+    var Data = {
+        taxi_qr_code: req.body.taxi_qr_code,
+        CUID: req.body.offerer,
+        start_location: req.body.start_location,
+        end_location: req.body.end_location,
+        maxriders: req.body.max_riders,
+        stops: req.body.stops,
+        ETA: req.body.ETA,
+        riders: req.body.riders,
+        distance: req.body.distance
+    };
+    offertempCarpool(Data, res);
 });
 
 app.listen(PORT, function () {

@@ -14,7 +14,7 @@ exports.registerUser = async (data, res) => {
             "address": data.address,
             //"DiscordAuthToken": "",
             "DOB": data.DOB,
-            "rating": 5.0,
+            "rating": "5.0",
             "num_ratings": 0,
             "friendRequestList": [],
             "friendList": [],
