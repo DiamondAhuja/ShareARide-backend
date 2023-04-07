@@ -116,11 +116,6 @@ app.post('/editprofile', function (req, res) {
         phoneNumber: req.body.phoneNumber,
         address: req.body.address,
         DiscordAuthToken: req.body.DiscordAuthToken,
-        DOB: req.body.DOB,
-        rating: req.body.rating,
-        friendRequestList: req.body.friendRequestList,
-        friendList: req.body.friendList,
-        sentFriendRequestList: req.body.sentFriendRequestList,
         email: req.body.email
     };
     editUserProfile(Data, res);

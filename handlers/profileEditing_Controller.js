@@ -10,24 +10,20 @@ exports.editUserProfile = async (data, res) => {
     try {
         //console.log(data);
         db.collection("CustomerInformationDB").doc(data.CUID).update({
-            "id": data.CUID,
             "firstName": data.firstName,
             "lastName": data.lastName,
             "phoneNumber": data.phoneNumber,
             "address": data.address,
-            "DiscordAuthToken": "",
-            "DOB": data.DOB,
-            "rating": data.rating,
-            "friendRequestList": [],
-            "friendList": [],
-            "sentFriendRequestList": [],
+            "DiscordAuthToken": data.DiscordAuthToken,
             "email": data.email
         })
             .then((docRef) => {
                 console.log("Profile updated");
+                res.status(201).json({ message: "Profile updated" });
             })
             .catch((error) => {
                 console.error("Error updating profile: ", error);
+                return res.status(500).json({ general: "Something went wrong, please try again" });
             });
     } catch (error) {
         console.log("Something went wrong, please try again", error);
@@ -49,6 +45,7 @@ exports.deleteUser = async (uid, res) => {
             })
             .catch((error) => {
                 console.log('Error deleting user:', error);
+                return res.status(500).json({ general: "Something went wrong, please try again" });
             });
     } catch (error) {
         console.log("Something went wrong, please try again", error);
