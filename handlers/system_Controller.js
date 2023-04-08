@@ -1,4 +1,5 @@
 const { db } = require("../util/admin");
+const { admin } = require("../util/admin");
 
 // this function will create a document for the user with the parameters defined
 const taxiinformationDB = db.collection('TaxiInformationDB');
@@ -241,4 +242,44 @@ exports.startRide = (data, res) => {
     }
 }
 
+exports.requestJoinCarpool = (data, res) => {
+    try {
+        //console.log(data);
+        var rideRef = rideinformationDB.doc(data.RID);
 
+        rideRef.get()
+            .then((doc) => {
+                if (doc.exists) {
+                    if (doc.data().status == "closed") {
+                        console.log("Ride already started");
+                        return res.status(500).json({ Message: "Ride already started" });
+                    }
+                    else {
+
+                        var  x = { CUID: data.CUID, pickup_locationid: data.pickup_locationid };
+
+                        rideRef.update({
+                            requesterlist: admin.firestore.FieldValue.arrayUnion(x)
+                        })
+                            .then(() => {
+                                console.log("Requester added");
+                                return res.status(201).json({ Message: "Requester added" });
+                            })
+                            .catch((error) => {
+                                console.error("Error updating document: ", error);
+                                return res.status(500).json({ Message: "Error updating document" });
+                            });
+                    }
+                } else {
+                    // doc.data() will be undefined in this case
+                    console.log("No such document!");
+                    return res.status(500).json({ Message: "No such document!" });
+                }
+            }).catch((error) => {
+                console.log("Error getting the list:", error);
+            });
+    } catch (error) {
+        console.log("Something went wrong, please try again", error);
+        return res.status(500).json({ general: "Something went wrong, please try again" });
+    }
+}

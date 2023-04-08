@@ -11,7 +11,7 @@ const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
 const bodyParser = require('body-parser');
 const { rateUser } = require('./handlers/rating_Controller');
-const { validateTaxiInfo, offertempCarpool, requestCarpool, getCarpoolRequests, getRideInfo, finishRide, startRide, getMyOffers, getMyCarpoolRequests } = require('./handlers/system_Controller');
+const { validateTaxiInfo, offertempCarpool, requestCarpool, getCarpoolRequests, getRideInfo, finishRide, startRide, requestJoinCarpool } = require('./handlers/system_Controller');
 const { encryptMsg, decryptMsg } = require('./handlers/encryption');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -272,6 +272,15 @@ app.post('/startride', function (req, res) {
     startRide(Data, res);
 });
 
+// API CALL for request to join a carpool
+app.post('/requestjoincarpool', function (req, res) {
+    var Data = {
+        RID: req.body.RideID,
+        CUID: req.body.CUID,
+        pickup_locationid: req.body.pickup_locationid
+    };
+    requestJoinCarpool(Data, res);
+});
 
 
 
