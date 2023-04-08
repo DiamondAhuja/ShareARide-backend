@@ -106,7 +106,7 @@ app.post('/logout/', function (req, res) {
 });
 
 // API CALL for Getting a user's information encryption done
-app.get('/getuserinfo/', function (req, res) {
+app.post('/getuserinfo/', function (req, res) {
     var decryptedstuff = req.body
     var UID = decryptedstuff.UID;
     getUserInfo(UID, res);
@@ -154,13 +154,13 @@ app.post('/sendfriendrequest/', function (req, res) {
 });
 
 // API CALL for getting the friend requests
-app.get('/getfriendrequests/', function (req, res) {
+app.post('/getfriendrequests/', function (req, res) {
     var UID = req.body.CUID;
     getFriendRequests(UID, res);
 });
 
 // API CALL for GET FRIENDS LIST
-app.get('/getfriendslist/', function (req, res) {
+app.post('/getfriendslist/', function (req, res) {
     var UID = req.body.UID;
     getFriends(UID, res);
 });
@@ -205,7 +205,7 @@ app.post('/rateuser', function (req, res) {
 });
 
 // API CALL for scanning qr code
-app.get('/scanqrcode', function (req, res) {
+app.post('/scanqrcode', function (req, res) {
     var qrcode = req.body.qrcode;
     validateTaxiInfo(qrcode, res);
 });
@@ -229,7 +229,7 @@ app.post('/offertempcarpool', function (req, res) {
 });
 
 // API CALL for requesting carpool needs work
-app.get('/requestcarpool', function (req, res) {
+app.post('/requestcarpool', function (req, res) {
     var Data = {
         CUID: req.body.requester,
         start_location: req.body.start_location,
@@ -243,13 +243,13 @@ app.get('/requestcarpool', function (req, res) {
 });
 
 // API CALL for getting the carpool requests
-app.get('/getcarpoolrequests/', function (req, res) {
+app.post('/getcarpoolrequests/', function (req, res) {
     var RID = req.body.RideID;
     getCarpoolRequests(RID, res);
 });
 
 // API CALL for getting ride information
-app.get('/getrideinfo/', function (req, res) {
+app.post('/getrideinfo/', function (req, res) {
     var RID = req.body.RideID;
     getRideInfo(RID, res);
 });
