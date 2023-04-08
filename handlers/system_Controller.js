@@ -97,7 +97,7 @@ exports.requestCarpool = (data, res) => {
         //console.log(data);
         rideinformationDB.where("endlocationid","==",data.end_location_id).get().then(docs => {
 
-            var potentialrides = {};
+            var potentialrides = [];
 
             docs.forEach(doc => {
                 if (doc.data().status == "closed") {}
@@ -107,7 +107,7 @@ exports.requestCarpool = (data, res) => {
                         if (doc.data().maxriders > data.max_riders) {}
                         else{
                         //console.log(doc.data().offererrating);
-                        potentialrides[doc.id] = doc.data();
+                        potentialrides.push(doc.data());
                         }
                     }
                 }

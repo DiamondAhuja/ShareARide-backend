@@ -145,3 +145,27 @@ exports.removeFriend = (data, res) => {
         res.status(500).json({ general: "Something went wrong, please try again" });
     }
 }
+
+exports.searchFriends = (data, res) => {
+    try {
+        console.log(data);
+        customerinformationDB.where("firstName","==",data.firstname).get()
+            .then((docs) => {
+
+                var potentialfriends = {};
+
+                docs.forEach(doc => {
+                    potentialfriends[doc.id] = doc.data();
+                });
+    
+                console.log(potentialfriends);
+                return res.status(201).json(potentialfriends);
+            }).catch((error) => {
+                console.log("Error getting the list:", error);
+                return res.status(500).json({ Message: "Error getting the list:" });
+            });
+    } catch (error) {
+        console.log("Something went wrong, please try again", error);
+        return res.status(500).json({ Message: "Something went wrong, please try again" });
+    }
+}

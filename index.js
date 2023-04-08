@@ -5,7 +5,7 @@ var app = express();
 const PORT = process.env.PORT || 5050
 const { books } = require('./handlers/books')
 const { registerUser, getUserInfo } = require('./handlers/createAccount_Controller')
-const { getFriends, sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend, getFriendRequests } = require('./handlers/addFriends_Controller')
+const { getFriends, sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend, getFriendRequests, searchFriends } = require('./handlers/addFriends_Controller')
 const { deleteUser, editUserProfile, changePassword } = require('./handlers/profileEditing_Controller')
 const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
@@ -292,6 +292,13 @@ app.post('/requestjoincarpool', function (req, res) {
     requestJoinCarpool(Data, res);
 });
 
+// API CALL search for friends
+app.post('/searchfriends', function (req, res) {
+    var Data = {
+        "firstname": req.body.firstname,
+    };
+    searchFriends(Data, res);
+});
 
 
 
