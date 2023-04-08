@@ -5,7 +5,7 @@ var app = express();
 const PORT = process.env.PORT || 5050
 const { books } = require('./handlers/books')
 const { registerUser, getUserInfo } = require('./handlers/createAccount_Controller')
-const { getFriends, sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend } = require('./handlers/addFriends_Controller')
+const { getFriends, sendFriendRequest, acceptFriendRequest, declineFriendRequest, removeFriend, getFriendRequests } = require('./handlers/addFriends_Controller')
 const { deleteUser, editUserProfile, changePassword } = require('./handlers/profileEditing_Controller')
 const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
@@ -151,6 +151,12 @@ app.post('/sendfriendrequest/', function (req, res) {
     };
     //console.log(Data);
     sendFriendRequest(Data, res);
+});
+
+// API CALL for getting the friend requests
+app.get('/getfriendrequests/', function(req, res){
+    var UID = req.body.CUID;
+    getFriendRequests(UID, res);
 });
 
 // API CALL for GET FRIENDS LIST

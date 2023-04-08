@@ -4,12 +4,12 @@ const { db, admin } = require("../util/admin");
 
 const customerinformationDB = db.collection('CustomerInformationDB');
 
-exports.getFriends = async (CUID, res) => {
-    try{
-            //console.log(data);
-            var docRef = customerinformationDB.doc(CUID);
+exports.getFriends = (CUID, res) => {
+    try {
+        //console.log(data);
+        var docRef = customerinformationDB.doc(CUID);
 
-            docRef.get()
+        docRef.get()
             .then((doc) => {
                 if (doc.exists) {
                     //console.log("Document data:", doc.data());
@@ -19,7 +19,7 @@ exports.getFriends = async (CUID, res) => {
                 } else {
                     // doc.data() will be undefined in this case
                     console.log("No such document!");
-                    return res.status(500).json({ general: "Something went wrong, please try again"});
+                    return res.status(500).json({ general: "Something went wrong, please try again" });
                 }
             }).catch((error) => {
                 console.log("Error getting document:", error);
@@ -29,96 +29,119 @@ exports.getFriends = async (CUID, res) => {
     }
 };
 
-exports.sendFriendRequest = async (data, res) => {
-    try{
-            console.log(data);
-            var docRef_requestor = customerinformationDB.doc(data.requestor_CUID);
-            var docRef_reciever = customerinformationDB.doc(data.reciever_CUID);
+exports.sendFriendRequest = (data, res) => {
+    try {
+        console.log(data);
+        var docRef_requestor = customerinformationDB.doc(data.requestor_CUID);
+        var docRef_reciever = customerinformationDB.doc(data.reciever_CUID);
 
-            docRef_requestor.update({
-                sentFriendRequestList: admin.firestore.FieldValue.arrayUnion(data.reciever_CUID)
-            });
-            
-            docRef_reciever.update({
-                friendRequestList: admin.firestore.FieldValue.arrayUnion(data.requestor_CUID)
-            });
+        docRef_requestor.update({
+            sentFriendRequestList: admin.firestore.FieldValue.arrayUnion(data.reciever_CUID)
+        });
 
-            console.log("Succcess sending friend request");
-            res.status(201).json({ general: "Friend request sent"});
+        docRef_reciever.update({
+            friendRequestList: admin.firestore.FieldValue.arrayUnion(data.requestor_CUID)
+        });
+
+        console.log("Succcess sending friend request");
+        res.status(201).json({ general: "Friend request sent" });
     } catch (error) {
         console.log("Something went wrong, please try again", error);
-        res.status(500).json({ general: "Something went wrong, please try again"});
+        res.status(500).json({ general: "Something went wrong, please try again" });
     }
 };
 
-exports.acceptFriendRequest = async (data, res) => {
-    try{
-            console.log(data);
-            var docRef_requestor = customerinformationDB.doc(data.requestor_CUID);
-            var docRef_acceptor = customerinformationDB.doc(data.acceptor_CUID);
+exports.getFriendRequests = (CUID, res) => {
+    try {
+        //console.log(data);
+        var docRef = customerinformationDB.doc(CUID);
 
-            docRef_requestor.update({
-                sentFriendRequestList: admin.firestore.FieldValue.arrayRemove(data.acceptor_CUID)
+        docRef.get()
+            .then((doc) => {
+                if (doc.exists) {
+                    console.log("Success retrieving friend requests");
+                    return res.status(201).json(doc.data().sentFriendRequestList);
+                } else {
+                    // doc.data() will be undefined in this case
+                    console.log("No such document!");
+                    return res.status(500).json({ Message: "No such document!" });
+                }
+            }).catch((error) => {
+                console.log("Error getting the list:", error);
             });
-
-            docRef_requestor.update({
-                friendList: admin.firestore.FieldValue.arrayUnion(data.acceptor_CUID)
-            });
-            
-            docRef_acceptor.update({
-                friendRequestList: admin.firestore.FieldValue.arrayRemove(data.requestor_CUID)
-            });
-
-            docRef_acceptor.update({
-                friendList: admin.firestore.FieldValue.arrayUnion(data.requestor_CUID)
-            });
-
-            console.log("Succcess accepting friend request");
-            res.status(201).json({ general: "Friend request accepted"});
     } catch (error) {
         console.log("Something went wrong, please try again", error);
-        res.status(500).json({ general: "Something went wrong, please try again"});
     }
 };
 
-exports.declineFriendRequest = async (data, res) => {
-    try{
-            console.log(data);
-            var docRef_requestor = customerinformationDB.doc(data.requestor_CUID);
-            var docRef_decliner = customerinformationDB.doc(data.decliner_CUID);
+exports.acceptFriendRequest = (data, res) => {
+    try {
+        console.log(data);
+        var docRef_requestor = customerinformationDB.doc(data.requestor_CUID);
+        var docRef_acceptor = customerinformationDB.doc(data.acceptor_CUID);
 
-            docRef_requestor.update({
-                sentFriendRequestList: admin.firestore.FieldValue.arrayRemove(data.decliner_CUID)
-            });
-            
-            docRef_decliner.update({
-                friendRequestList: admin.firestore.FieldValue.arrayRemove(data.requestor_CUID)
-            });
-            console.log("Succcess declining friend request");
-            res.status(201).json({ general: "Friend request declined"});
+        docRef_requestor.update({
+            sentFriendRequestList: admin.firestore.FieldValue.arrayRemove(data.acceptor_CUID)
+        });
+
+        docRef_requestor.update({
+            friendList: admin.firestore.FieldValue.arrayUnion(data.acceptor_CUID)
+        });
+
+        docRef_acceptor.update({
+            friendRequestList: admin.firestore.FieldValue.arrayRemove(data.requestor_CUID)
+        });
+
+        docRef_acceptor.update({
+            friendList: admin.firestore.FieldValue.arrayUnion(data.requestor_CUID)
+        });
+
+        console.log("Succcess accepting friend request");
+        res.status(201).json({ general: "Friend request accepted" });
     } catch (error) {
         console.log("Something went wrong, please try again", error);
-        res.status(500).json({ general: "Something went wrong, please try again"});
+        res.status(500).json({ general: "Something went wrong, please try again" });
     }
 };
 
-exports.removeFriend = async (data, res) => {
-    try{
-            console.log(data);
-            var docRef_remover = customerinformationDB.doc(data.remover_CUID);
-            var docRef_removed = customerinformationDB.doc(data.removed_CUID);
+exports.declineFriendRequest = (data, res) => {
+    try {
+        console.log(data);
+        var docRef_requestor = customerinformationDB.doc(data.requestor_CUID);
+        var docRef_decliner = customerinformationDB.doc(data.decliner_CUID);
 
-            docRef_remover.update({
-                friendList: admin.firestore.FieldValue.arrayRemove(data.removed_CUID)
-            });
-            
-            docRef_removed.update({
-                friendList: admin.firestore.FieldValue.arrayRemove(data.remover_CUID)
-            });
-            console.log("Succcess removing friend");
-            res.status(201).json({ general: "Friend removed"});
+        docRef_requestor.update({
+            sentFriendRequestList: admin.firestore.FieldValue.arrayRemove(data.decliner_CUID)
+        });
+
+        docRef_decliner.update({
+            friendRequestList: admin.firestore.FieldValue.arrayRemove(data.requestor_CUID)
+        });
+        console.log("Succcess declining friend request");
+        res.status(201).json({ general: "Friend request declined" });
     } catch (error) {
         console.log("Something went wrong, please try again", error);
-        res.status(500).json({ general: "Something went wrong, please try again"});
+        res.status(500).json({ general: "Something went wrong, please try again" });
+    }
+};
+
+exports.removeFriend = (data, res) => {
+    try {
+        console.log(data);
+        var docRef_remover = customerinformationDB.doc(data.remover_CUID);
+        var docRef_removed = customerinformationDB.doc(data.removed_CUID);
+
+        docRef_remover.update({
+            friendList: admin.firestore.FieldValue.arrayRemove(data.removed_CUID)
+        });
+
+        docRef_removed.update({
+            friendList: admin.firestore.FieldValue.arrayRemove(data.remover_CUID)
+        });
+        console.log("Succcess removing friend");
+        res.status(201).json({ general: "Friend removed" });
+    } catch (error) {
+        console.log("Something went wrong, please try again", error);
+        res.status(500).json({ general: "Something went wrong, please try again" });
     }
 }
