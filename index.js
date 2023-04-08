@@ -11,7 +11,7 @@ const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
 const bodyParser = require('body-parser');
 const { rateUser } = require('./handlers/rating_Controller');
-const { validateTaxiInfo, offertempCarpool, requestCarpool, getCarpoolRequests, getRideInfo, finishRide, startRide, requestJoinCarpool } = require('./handlers/system_Controller');
+const { validateTaxiInfo, offertempCarpool, requestCarpool, getCarpoolRequests, getRideInfo, finishRide, startRide, requestJoinCarpool, offererFinishRide } = require('./handlers/system_Controller');
 const { encryptMsg, decryptMsg } = require('./handlers/encryption');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -261,6 +261,16 @@ app.post('/finishride', function (req, res) {
         CUID: req.body.CUID,
     };
     finishRide(Data, res);
+});
+
+
+// API CALL for offerer finishing a ride
+app.post('/offererfinishride', function (req, res) {
+    var Data = {
+        RID: req.body.RideID,
+        CUID: req.body.CUID,
+    };
+    offererFinishRide(Data, res);
 });
 
 // API CALL for starting a ride

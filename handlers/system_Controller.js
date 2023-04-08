@@ -67,6 +67,11 @@ exports.offertempCarpool = (data, res) => {
                 })
                     .then((docRef) => {
                         console.log("Document written with ID: ", docRef.id);
+
+                        taxiinformationDB.doc(data.taxi_qr_code).update({
+                            "status": "in use"
+                        });
+
                         return res.status(201).json({ general: "Success", ride_id: docRef.id, current_fare: fare });
                     })
                     .catch((error) => {
@@ -185,6 +190,43 @@ exports.finishRide = (data, res) => {
   
                 } else {
                     // doc.data() will be undefined in this case
+                    console.log("No such document!");
+                    return res.status(500).json({ Message: "No such document!" });
+                }
+            }).catch((error) => {
+                console.log("Error getting the list:", error);
+            });
+    } catch (error) {
+        console.log("Something went wrong, please try again", error);
+        return res.status(500).json({ general: "Something went wrong, please try again" });
+    }
+}
+
+exports.offererFinishRide = (data, res) => {
+    try {
+        //console.log(data);
+        var rideRef = rideinformationDB.doc(data.RID);
+
+        rideRef.get()
+            .then((doc) => {
+                if (doc.exists) {
+                    if (data.CUID != doc.data().offerer) {
+                        console.log("Not the offerer");
+                        return res.status(500).json({ Message: "Not the offerer" });
+                    }
+                    else {
+                        taxiinformationDB.doc(doc.data().taxicode).update({
+                            status: "available"
+                        })
+                        console.log("Ride Complete");
+                        var riders = doc.data().riders;
+                        var indexrider = riders.indexOf(data.CUID);
+                        riders.splice(indexrider, 1);
+                        return res.status(201).json({ Message: "Ride Complete!", Fare: doc.data().fare, OtherRiders: riders});
+                    }
+                } else {
+                    // doc.data() will be undefined in this case
+
                     console.log("No such document!");
                     return res.status(500).json({ Message: "No such document!" });
                 }
