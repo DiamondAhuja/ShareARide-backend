@@ -5,7 +5,7 @@ const taxiinformationDB = db.collection('TaxiInformationDB');
 const customerinformationDB = db.collection('CustomerInformationDB');
 const rideinformationDB = db.collection('RideInformationDB');
 
-exports.validateTaxiInfo = async (qrcode, res) => {
+exports.validateTaxiInfo = (qrcode, res) => {
     try{
         //console.log(data);
         var docRef = taxiinformationDB.doc(qrcode);
@@ -33,7 +33,7 @@ exports.validateTaxiInfo = async (qrcode, res) => {
 
 
 // need to fix fare calculations
-exports.offertempCarpool = async (data, res) => {
+exports.offertempCarpool = (data, res) => {
     try {
         //console.log(data);
         const rating_ref = customerinformationDB.doc(data.CUID);
@@ -69,6 +69,29 @@ exports.offertempCarpool = async (data, res) => {
                         console.error("Error adding document: ", error);
                         return res.status(500).json({ general: "Something went wrong, please try again" })
                     });
+
+            } else {
+                // doc.data() will be undefined in this case
+                console.log("No such document!");
+                return res.status(500).json({ general: "Something went wrong, please try again" });
+            }
+        }).catch((error) => {
+            console.log("Error getting document:", error);
+        });
+    } catch (error) {
+        console.log("Something went wrong, please try again", error);
+    }
+};
+
+exports.requestcarpool = (data, res) => {
+    try {
+        //console.log(data);
+
+        rideinformationDB.get().then( docs => {
+            if (docs.exists) {
+                //console.log("Document data:", doc.data());
+                console.log(docs.data())
+                return res.status(201).json(docs.data());
 
             } else {
                 // doc.data() will be undefined in this case

@@ -11,7 +11,8 @@ const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
 const bodyParser = require('body-parser');
 const { rateUser } = require('./handlers/rating_Controller');
-const { validateTaxiInfo, offertempCarpool } = require('./handlers/system_Controller');
+const { validateTaxiInfo, offertempCarpool, requestcarpool } = require('./handlers/system_Controller');
+const { encryptMsg, decryptMsg } = require('./handlers/encryption');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -28,24 +29,25 @@ app.get('/', (req, res) => {
     console.log("SERVER UP AND WORKING.");
 })
 
-// API CALL for Creating an account  ///////////////////////// DONE
+// API CALL for Creating an account  encryption done ///////////////////////// DONE
 app.post('/registeraccount/', function (req, res) {
     //console.log(req.body);
-    let email = req.body.email;
-    let password = req.body.password;
-    let firstname = req.body.firstname;
-    let lastname = req.body.lastname;
-    let phonenumber = req.body.phonenumber;
-    let address = req.body.address;
-    let DOB = req.body.DOB;
+
+    var decrypted = req.body
+
+    let email = decrypted.email;
+    let password = decrypted.password;
+    let firstname = decrypted.firstname;
+    let lastname = decrypted.lastname;
+    let phonenumber = decrypted.phonenumber;
+    let address = decrypted.address;
+    let DOB = decrypted.DOB;
 
     admin.auth().createUser({
         email: email,
         password: password,
     }).then((userRecord) => {
         const user = userRecord.uid;
-        res.send({ Message: "Registration successful!", UID: user });
-        console.log("Success, here is the UID:", user);
 
         var docData = {
             email: email,
@@ -63,17 +65,19 @@ app.post('/registeraccount/', function (req, res) {
         registerUser(docData, res);
 
     })
-        .catch((error) => {
-            res.send("failed");
-            console.log("failed", error);
-        });
+    .catch((error) => {
+        res.json({ Message: "failed" });
+        console.log("failed", error);
+    });
 });
 
-// API CALL for Logging in
+// API CALL for Logging in encryption done
 app.post('/login/', function (req, res) {
-    console.log(req.body);
-    let email = req.body.email;
-    let password = req.body.password;
+
+    var decrypted = req.body
+
+    let email = decrypted.email;
+    let password = decrypted.password;
 
     firebase.auth().signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
@@ -84,9 +88,8 @@ app.post('/login/', function (req, res) {
             // ...
         })
         .catch((error) => {
-            var errorCode = error.code;
             var errorMessage = error.message;
-            res.send("Login failed " + errorMessage);
+            res.json({ Message: "Login failed!" + errorMessage });
             console.log("Login failed", error);
         });
 });
@@ -102,22 +105,26 @@ app.post('/logout/', function (req, res) {
     });
 });
 
-// API CALL for Getting a user's information
+// API CALL for Getting a user's information encryption done
 app.get('/getuserinfo/', function (req, res) {
-    var UID = req.body.UID;
+    var decryptedstuff = req.body
+    var UID = decryptedstuff.UID;
     getUserInfo(UID, res);
 });
 
-// API CALL for editing user profile
+// API CALL for editing user profile encryption done
 app.post('/editprofile', function (req, res) {
+
+    var decrypted = req.body
+
     var Data = {
-        CUID: req.body.UID,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        phoneNumber: req.body.phoneNumber,
-        address: req.body.address,
-        DiscordAuthToken: req.body.DiscordAuthToken,
-        email: req.body.email
+        CUID: decrypted.UID,
+        firstName: decrypted.firstName,
+        lastName: decrypted.lastName,
+        phoneNumber: decrypted.phoneNumber,
+        address: decrypted.address,
+        DiscordAuthToken: decrypted.DiscordAuthToken,
+        email: decrypted.email
     };
     editUserProfile(Data, res);
 });
@@ -212,6 +219,69 @@ app.post('/offertempcarpool', function (req, res) {
     };
     offertempCarpool(Data, res);
 });
+
+// API CALL for requesting carpool needs work
+app.post('/requestcarpool', function (req, res) {
+    var Data = {
+        CUID: req.body.requester,
+        start_location: req.body.start_location,
+        end_location: req.body.end_location,
+        min_rating: req.body.min_rating
+    };
+    requestCarpool(Data, res);
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// testing encryption
+app.get('/testencryption', function (req, res) {
+    var test = JSON.stringify(req.body);
+    console.log(test);
+    var result = encryptMsg(test, res)
+    console.log(result);
+    res.json({ msg: result });
+});
+
+// testing decryption
+app.get('/testdecryption', function (req, res) {
+    var test = req.body.msg;
+    console.log(test);
+    decryptMsg(test, res).then( result => {
+        console.log(result);
+        res.json({ msg: result });
+    });
+});
+
 
 app.listen(PORT, function () {
     console.log(`Demo project at: ${PORT}!`);

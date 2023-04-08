@@ -6,7 +6,7 @@ const { admin } = require("../util/admin");
 const customerinformationDB = db.collection('CustomerInformationDB');
 
 // this function changes user profile info in the database
-exports.editUserProfile = async (data, res) => {
+exports.editUserProfile = (data, res) => {
     try {
         //console.log(data);
         db.collection("CustomerInformationDB").doc(data.CUID).update({
@@ -26,11 +26,11 @@ exports.editUserProfile = async (data, res) => {
                     console.error("Error updating profile: ", error);
                 });
                 console.log("Profile updated");
-                res.status(201).json({ message: "Profile updated" });
+                res.status(201).json({ Message: "Profile updated!" });
 
             }).catch((error) => {
                 console.error("Error updating profile: ", error);
-                return res.status(500).json({ general: "Something went wrong, please try again" });
+                return res.status(500).json({ Message: "Error updating profile!" })
             });
     } catch (error) {
         console.log("Something went wrong, please try again", error);
@@ -38,7 +38,7 @@ exports.editUserProfile = async (data, res) => {
 };
 
 // this function allows user to change their password
-exports.changePassword = async (data, res) => {
+exports.changePassword = (data, res) => {
     try {
         admin.auth().updateUser(data.CUID, {
             password: data.newPassword
@@ -58,7 +58,7 @@ exports.changePassword = async (data, res) => {
 };
 
 // this function deletes user from the database
-exports.deleteUser = async (uid, res) => {
+exports.deleteUser = (uid, res) => {
     try {
         admin.auth().deleteUser(uid)
             .then(() => {

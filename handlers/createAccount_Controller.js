@@ -1,9 +1,10 @@
 const { db } = require("../util/admin");
+const { encryptMsg } = require("./encryption");
 
 // this function will create a document for the user with the parameters defined
 const customerinformationDB = db.collection('CustomerInformationDB');
 
-exports.registerUser = async (data, res) => {
+exports.registerUser = (data, res) => {
     try {
         //console.log(data);
         db.collection("CustomerInformationDB").doc(data.CUID).create({
@@ -23,6 +24,7 @@ exports.registerUser = async (data, res) => {
         })
             .then((docRef) => {
                 console.log("Document written with ID: ", data.CUID);
+                res.status(201).json({ Message: "Registration successful!", UID: data.CUID });
             })
             .catch((error) => {
                 console.error("Error adding document: ", error);
@@ -32,7 +34,7 @@ exports.registerUser = async (data, res) => {
     }
 };
 
-exports.getUserInfo = async (CUID, res) => {
+exports.getUserInfo = (CUID, res) => {
     try {
         //console.log(data);
         var docRef = customerinformationDB.doc(CUID);
@@ -42,12 +44,12 @@ exports.getUserInfo = async (CUID, res) => {
                 if (doc.exists) {
                     //console.log("Document data:", doc.data());
                     //console.log(doc.data().friendList);
-                    console.log("Succcess retrieving user info");
+                    console.log("Success retrieving user info");
                     return res.status(201).json(doc.data());
                 } else {
                     // doc.data() will be undefined in this case
                     console.log("No such document!");
-                    return res.status(500).json({ general: "Something went wrong, please try again" });
+                    return res.status(500).json({ Message: "No such document!" });
                 }
             }).catch((error) => {
                 console.log("Error getting document:", error);
