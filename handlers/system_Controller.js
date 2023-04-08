@@ -43,7 +43,7 @@ exports.offertempCarpool = (data, res) => {
             if (doc.exists) {
                 //console.log("Document data:", doc.data());
                 rating = doc.data().rating;
-                var fare = (1.8*data.distance) / data.riders.length();
+                var fare = (1.8*data.distance) / data.riders.length;
 
                 rideinformationDB.add({
                     "rideid": doc.id,
@@ -51,7 +51,7 @@ exports.offertempCarpool = (data, res) => {
                     "taxicode": data.taxi_qr_code,
                     "maxriders": data.maxriders,
                     "offerer": data.CUID,
-                    "requesterlist": [],
+                    "requesterlist": {},
                     "riders": data.riders,
                     "endlocation": data.end_location,
                     "endlocationid": data.end_location_id,
