@@ -11,7 +11,7 @@ const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
 const bodyParser = require('body-parser');
 const { rateUser } = require('./handlers/rating_Controller');
-const { validateTaxiInfo, offertempCarpool, requestcarpool, getCarpoolRequests } = require('./handlers/system_Controller');
+const { validateTaxiInfo, offertempCarpool, requestCarpool, getCarpoolRequests, getRideInfo, finishRide, startRide, getMyOffers, getMyCarpoolRequests } = require('./handlers/system_Controller');
 const { encryptMsg, decryptMsg } = require('./handlers/encryption');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -216,7 +216,9 @@ app.post('/offertempcarpool', function (req, res) {
         taxi_qr_code: req.body.taxi_qr_code,
         CUID: req.body.offerer,
         start_location: req.body.start_location,
+        start_location_id: req.body.start_location_id,
         end_location: req.body.end_location,
+        end_location_id: req.body.end_location_id,
         maxriders: req.body.max_riders,
         stops: req.body.stops,
         ETA: req.body.ETA,
@@ -227,12 +229,15 @@ app.post('/offertempcarpool', function (req, res) {
 });
 
 // API CALL for requesting carpool needs work
-app.post('/requestcarpool', function (req, res) {
+app.get('/requestcarpool', function (req, res) {
     var Data = {
         CUID: req.body.requester,
         start_location: req.body.start_location,
+        start_location_id: req.body.start_location_id,
         end_location: req.body.end_location,
-        min_rating: req.body.min_rating
+        end_location_id: req.body.end_location_id,
+        min_rating: req.body.min_rating,
+        max_riders: req.body.max_riders,
     };
     requestCarpool(Data, res);
 });
@@ -243,9 +248,29 @@ app.get('/getcarpoolrequests/', function (req, res) {
     getCarpoolRequests(RID, res);
 });
 
+// API CALL for getting ride information
+app.get('/getrideinfo/', function (req, res) {
+    var RID = req.body.RideID;
+    getRideInfo(RID, res);
+});
 
+//API CALL for finishing a ride
+app.post('/finishride', function (req, res) {
+    var Data = {
+        RID: req.body.RideID,
+        CUID: req.body.CUID,
+    };
+    finishRide(Data, res);
+});
 
-
+// API CALL for starting a ride
+app.post('/startride', function (req, res) {
+    var Data = {
+        RID: req.body.RideID,
+        CUID: req.body.CUID,
+    };
+    startRide(Data, res);
+});
 
 
 

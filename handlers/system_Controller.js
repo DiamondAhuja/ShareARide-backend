@@ -43,9 +43,10 @@ exports.offertempCarpool = (data, res) => {
             if (doc.exists) {
                 //console.log("Document data:", doc.data());
                 rating = doc.data().rating;
-                var fare = 0;
+                var fare = (1.8*data.distance) / data.riders.length();
 
                 rideinformationDB.add({
+                    "rideid": doc.id,
                     "ridetype": "tempoffer",
                     "taxicode": data.taxi_qr_code,
                     "maxriders": data.maxriders,
@@ -53,7 +54,9 @@ exports.offertempCarpool = (data, res) => {
                     "requesterlist": [],
                     "riders": data.riders,
                     "endlocation": data.end_location,
+                    "endlocationid": data.end_location_id,
                     "startlocation": data.start_location,
+                    "startlocationid": data.start_location_id,
                     "offererrating": rating,
                     "status": "open",
                     "ETA": data.ETA,
@@ -63,7 +66,7 @@ exports.offertempCarpool = (data, res) => {
                 })
                     .then((docRef) => {
                         console.log("Document written with ID: ", docRef.id);
-                        return res.status(201).json({ general: "Success", ride_id: docRef.id });
+                        return res.status(201).json({ general: "Success", ride_id: docRef.id, current_fare: fare });
                     })
                     .catch((error) => {
                         console.error("Error adding document: ", error);
@@ -83,26 +86,36 @@ exports.offertempCarpool = (data, res) => {
     }
 };
 
-exports.requestcarpool = (data, res) => {
+exports.requestCarpool = (data, res) => {
     try {
         //console.log(data);
+        rideinformationDB.where("endlocationid","==",data.end_location_id).get().then(docs => {
 
-        rideinformationDB.get().then(docs => {
-            if (docs.exists) {
-                //console.log("Document data:", doc.data());
-                console.log(docs.data())
-                return res.status(201).json(docs.data());
+            var potentialrides = {};
 
-            } else {
-                // doc.data() will be undefined in this case
-                console.log("No such document!");
-                return res.status(500).json({ general: "Something went wrong, please try again" });
-            }
+            docs.forEach(doc => {
+                if (doc.data().status == "closed") {}
+                else{
+                    if (doc.data().offererrating < data.min_rating) {}
+                    else{
+                        if (doc.data().maxriders > data.max_riders) {}
+                        else{
+                        //console.log(doc.data().offererrating);
+                        potentialrides[doc.id] = doc.data();
+                        }
+                    }
+                }
+            });
+
+            console.log(potentialrides);
+            return res.status(201).json(potentialrides);
+
         }).catch((error) => {
             console.log("Error getting document:", error);
         });
     } catch (error) {
         console.log("Something went wrong, please try again", error);
+        return res.status(500).json({ general: "Something went wrong, please try again" });
     }
 };
 
@@ -128,3 +141,104 @@ exports.getCarpoolRequests = (RID, res) => {
         console.log("Something went wrong, please try again", error);
     }
 };
+
+exports.getRideInfo = (RID, res) => {
+    try {
+        //console.log(data);
+        var rideRef = rideinformationDB.doc(RID);
+
+        rideRef.get()
+            .then((doc) => {
+                if (doc.exists) {
+                    console.log("Success retrieving ride info");
+                    console.log(doc.data());
+                    return res.status(201).json(doc.data());
+                } else {
+                    // doc.data() will be undefined in this case
+                    console.log("No such document!");
+                    return res.status(500).json({ Message: "No such document!" });
+                }
+            }).catch((error) => {
+                console.log("Error getting the list:", error);
+            });
+    } catch (error) {
+        console.log("Something went wrong, please try again", error);
+        return res.status(500).json({ general: "Something went wrong, please try again" });
+    }
+}
+
+exports.finishRide = (data, res) => {
+    try {
+        //console.log(data);
+        var rideRef = rideinformationDB.doc(data.RID);
+
+        rideRef.get()
+            .then((doc) => {
+                if (doc.exists) {
+                    console.log("Ride Complete");
+                    var riders = doc.data().riders;
+                    var indexrider = riders.indexOf(data.CUID);
+                    riders.splice(indexrider, 1);
+
+                    return res.status(201).json({ Message: "Ride Complete!", Fare: doc.data().fare, OtherRiders: riders});
+  
+                } else {
+                    // doc.data() will be undefined in this case
+                    console.log("No such document!");
+                    return res.status(500).json({ Message: "No such document!" });
+                }
+            }).catch((error) => {
+                console.log("Error getting the list:", error);
+            });
+    } catch (error) {
+        console.log("Something went wrong, please try again", error);
+        return res.status(500).json({ general: "Something went wrong, please try again" });
+    }
+}
+
+exports.startRide = (data, res) => {
+    try {
+        //console.log(data);
+        var rideRef = rideinformationDB.doc(data.RID);
+
+        rideRef.get()
+            .then((doc) => {
+                if (doc.exists) {
+                    if (data.CUID != doc.data().offerer) {
+                        console.log("Not the offerer");
+                        return res.status(500).json({ Message: "Not the offerer" });
+                    }
+                    else {
+                        if (doc.data().status == "closed") {
+                            console.log("Ride already started");
+                            return res.status(500).json({ Message: "Ride already started" });
+                        }
+                        else {
+                            rideRef.update({
+                                status: "closed"
+                            })
+                                .then(() => {
+                                    console.log("Ride started");
+                                    return res.status(201).json({ Message: "Ride started" });
+                                })
+                                .catch((error) => {
+                                    console.error("Error updating document: ", error);
+                                    return res.status(500).json({ Message: "Error updating document" });
+                                });
+                        }
+                    }  
+                } else {
+                    // doc.data() will be undefined in this case
+                    console.log("No such document!");
+                    return res.status(500).json({ Message: "No such document!" });
+                }
+            }).catch((error) => {
+                console.log("Error getting the list:", error);
+            });
+    } catch (error) {
+        console.log("Something went wrong, please try again", error);
+        return res.status(500).json({ general: "Something went wrong, please try again" });
+    }
+}
+
+
