@@ -11,7 +11,7 @@ const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
 const bodyParser = require('body-parser');
 const { rateUser } = require('./handlers/rating_Controller');
-const { validateTaxiInfo, offertempCarpool, requestcarpool } = require('./handlers/system_Controller');
+const { validateTaxiInfo, offertempCarpool, requestcarpool, getCarpoolRequests } = require('./handlers/system_Controller');
 const { encryptMsg, decryptMsg } = require('./handlers/encryption');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -65,10 +65,10 @@ app.post('/registeraccount/', function (req, res) {
         registerUser(docData, res);
 
     })
-    .catch((error) => {
-        res.json({ Message: "failed" });
-        console.log("failed", error);
-    });
+        .catch((error) => {
+            res.json({ Message: "failed" });
+            console.log("failed", error);
+        });
 });
 
 // API CALL for Logging in encryption done
@@ -154,7 +154,7 @@ app.post('/sendfriendrequest/', function (req, res) {
 });
 
 // API CALL for getting the friend requests
-app.get('/getfriendrequests/', function(req, res){
+app.get('/getfriendrequests/', function (req, res) {
     var UID = req.body.CUID;
     getFriendRequests(UID, res);
 });
@@ -237,7 +237,11 @@ app.post('/requestcarpool', function (req, res) {
     requestCarpool(Data, res);
 });
 
-
+// API CALL for getting the carpool requests
+app.get('/getcarpoolrequests/', function (req, res) {
+    var RID = req.body.RideID;
+    getCarpoolRequests(RID, res);
+});
 
 
 
@@ -282,7 +286,7 @@ app.get('/testencryption', function (req, res) {
 app.get('/testdecryption', function (req, res) {
     var test = req.body.msg;
     console.log(test);
-    decryptMsg(test, res).then( result => {
+    decryptMsg(test, res).then(result => {
         console.log(result);
         res.json({ msg: result });
     });

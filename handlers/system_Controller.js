@@ -6,26 +6,26 @@ const customerinformationDB = db.collection('CustomerInformationDB');
 const rideinformationDB = db.collection('RideInformationDB');
 
 exports.validateTaxiInfo = (qrcode, res) => {
-    try{
+    try {
         //console.log(data);
         var docRef = taxiinformationDB.doc(qrcode);
 
         docRef.get()
-        .then((doc) => {
-            if (doc.exists) {
-                //console.log("Document data:", doc.data());
-                //console.log(doc.data().friendList);
-                console.log("Success validating taxi info");
-                console.log("taxistatus:", doc.data().status);
-                return res.status(201).json({ taxistatus: doc.data().status});
-            } else {
-                // doc.data() will be undefined in this case
-                console.log("No such taxi!");
-                return res.status(500).json({ general: "Something went wrong, please try again"});
-            }
-        }).catch((error) => {
-            console.log("Error getting taxi:", error);
-        });
+            .then((doc) => {
+                if (doc.exists) {
+                    //console.log("Document data:", doc.data());
+                    //console.log(doc.data().friendList);
+                    console.log("Success validating taxi info");
+                    console.log("taxistatus:", doc.data().status);
+                    return res.status(201).json({ taxistatus: doc.data().status });
+                } else {
+                    // doc.data() will be undefined in this case
+                    console.log("No such taxi!");
+                    return res.status(500).json({ general: "Something went wrong, please try again" });
+                }
+            }).catch((error) => {
+                console.log("Error getting taxi:", error);
+            });
     } catch (error) {
         console.log("Something went wrong, please try again", error);
     }
@@ -39,7 +39,7 @@ exports.offertempCarpool = (data, res) => {
         const rating_ref = customerinformationDB.doc(data.CUID);
         var rating;
 
-        rating_ref.get().then( doc => {
+        rating_ref.get().then(doc => {
             if (doc.exists) {
                 //console.log("Document data:", doc.data());
                 rating = doc.data().rating;
@@ -63,7 +63,7 @@ exports.offertempCarpool = (data, res) => {
                 })
                     .then((docRef) => {
                         console.log("Document written with ID: ", docRef.id);
-                        return res.status(201).json({ general: "Success", ride_id: docRef.id});
+                        return res.status(201).json({ general: "Success", ride_id: docRef.id });
                     })
                     .catch((error) => {
                         console.error("Error adding document: ", error);
@@ -87,7 +87,7 @@ exports.requestcarpool = (data, res) => {
     try {
         //console.log(data);
 
-        rideinformationDB.get().then( docs => {
+        rideinformationDB.get().then(docs => {
             if (docs.exists) {
                 //console.log("Document data:", doc.data());
                 console.log(docs.data())
@@ -101,6 +101,29 @@ exports.requestcarpool = (data, res) => {
         }).catch((error) => {
             console.log("Error getting document:", error);
         });
+    } catch (error) {
+        console.log("Something went wrong, please try again", error);
+    }
+};
+
+exports.getCarpoolRequests = (RID, res) => {
+    try {
+        //console.log(data);
+        var rideRef = rideinformationDB.doc(RID);
+
+        rideRef.get()
+            .then((doc) => {
+                if (doc.exists) {
+                    console.log("Success retrieving requester list");
+                    return res.status(201).json(doc.data().requesterlist);
+                } else {
+                    // doc.data() will be undefined in this case
+                    console.log("No such document!");
+                    return res.status(500).json({ Message: "No such document!" });
+                }
+            }).catch((error) => {
+                console.log("Error getting the list:", error);
+            });
     } catch (error) {
         console.log("Something went wrong, please try again", error);
     }
