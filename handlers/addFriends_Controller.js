@@ -60,7 +60,7 @@ exports.getFriendRequests = (CUID, res) => {
             .then((doc) => {
                 if (doc.exists) {
                     console.log("Success retrieving friend requests");
-                    return res.status(201).json(doc.data().sentFriendRequestList);
+                    return res.status(201).json(doc.data().friendRequestList);
                 } else {
                     // doc.data() will be undefined in this case
                     console.log("No such document!");
