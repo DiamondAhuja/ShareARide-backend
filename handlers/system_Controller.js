@@ -68,6 +68,10 @@ exports.offertempCarpool = (data, res) => {
                     .then((docRef) => {
                         console.log("Document written with ID: ", docRef.id);
 
+                        rideinformationDB.doc(docRef.id).update({
+                            "rideid": docRef.id
+                        });
+
                         taxiinformationDB.doc(data.taxi_qr_code).update({
                             "status": "in use"
                         });
