@@ -11,7 +11,7 @@ const { admin } = require("./util/admin");
 const { firebase } = require("./util/firebase");
 const bodyParser = require('body-parser');
 const { rateUser } = require('./handlers/rating_Controller');
-const { validateTaxiInfo, offertempCarpool, requestCarpool, getCarpoolRequests, getRideInfo, finishRide, startRide, requestJoinCarpool, offererFinishRide } = require('./handlers/system_Controller');
+const { validateTaxiInfo, offertempCarpool, requestCarpool, getCarpoolRequests, getRideInfo, finishRide, startRide, requestJoinCarpool, offererFinishRide, acceptCarpoolRequest, declineCarpoolRequest } = require('./handlers/system_Controller');
 const { encryptMsg, decryptMsg } = require('./handlers/encryption');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -290,6 +290,28 @@ app.post('/requestjoincarpool', function (req, res) {
         pickup_locationid: req.body.pickup_locationid
     };
     requestJoinCarpool(Data, res);
+});
+
+// API Call for accepting carpool requester
+app.post('/acceptcarpoolrequest', function (req, res) {
+    var Data = {
+        newDistance: req.body.newDistance,
+        requesterCUID: req.body.requesterCUID,
+        offererCUID: req.body.offererCUID,
+        RID: req.body.rideID,
+        newETA: req.body.newETA
+    };
+    acceptCarpoolRequest(Data, res);
+});
+
+// API Call for declining carpool requester
+app.post('/declinecarpoolrequest', function (req, res) {
+    var Data = {
+        requesterCUID: req.body.requesterCUID,
+        offererCUID: req.body.offererCUID,
+        RID: req.body.rideID
+    };
+    declineCarpoolRequest(Data, res);
 });
 
 // API CALL search for friends
